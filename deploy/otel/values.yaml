@@ -1,0 +1,147 @@
+mode: deployment
+
+replicaCount: 3
+
+presets:
+  logsCollection:
+    enabled: false
+    includeCollectorLogs: false
+
+resources:
+  requests:
+    cpu: 256m
+    memory: 1Gi
+  limits:
+    cpu: 256m
+    memory: 1Gi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecsecuritycontextselinuxoptions
+  # seLinuxOptions:
+  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecsecuritycontextselinuxoptions
+  # seccompProfile:
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecpodsecuritycontextselinuxoptions
+  # seLinuxOptions:
+  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecpodsecuritycontextselinuxoptions
+  # seccompProfile:
+
+# In case of daemonset
+podMonitor: 
+  enabled: false
+  metricsEndpoints:
+  - port: metrics
+    interval: 15s
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 75%
+    # maxUnavailable: 1
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+prometheusRule:
+  enabled: true
+  defaultRules:
+    enabled: true
+
+# Deprecated.  Use presets.logsCollection instead.
+containerLogs:
+  enabled: false
+
+ports:
+  otlp:
+    enabled: true
+    containerPort: 4317
+    servicePort: 4317
+    hostPort: 4317
+    protocol: TCP
+  otlp-http:
+    enabled: false
+  jaeger-compact:
+    enabled: false
+  jaeger-thrift:
+    enabled: false
+  jaeger-grpc:
+    enabled: false
+  zipkin:
+    enabled: false
+  metrics:
+    enabled: true
+    containerPort: 8888
+    servicePort: 8888
+    protocol: TCP
+  app-metrics:
+    enabled: true
+    containerPort: 9888
+    servicePort: 9888
+    protocol: TCP
+
+serviceMonitor:
+  enabled: true
+  metricsEndpoints:
+  - port: metrics
+    interval: 15s
+  - port: app-metrics
+    interval: 15s
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc: {}
+    jaeger: null
+    zipkin: null
+  processors:
+    batch: {}
+    # If set to null, will be overridden with values based on k8s resource limits
+    memory_limiter: null
+  exporters:
+    prometheus:
+      endpoint: "0.0.0.0:9888"    
+    azuremonitor:
+      instrumentation_key: "Instrumentation-Key"
+      maxbatchsize: 100
+      maxbatchinterval: 10s
+    zipkin:
+      endpoint: "http://zipkin.otel-demo:9411/api/v2/spans"
+    logging: {}
+  extensions:
+    # The health_check extension is mandatory for this chart.
+    # Without the health_check extension the collector will fail the readiness and liveliness probes.
+    # The health_check extension can be modified, but should never be removed.
+    health_check: {}
+  service:
+    extensions: [health_check]
+    telemetry:
+      logs:
+        level: "debug"
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter,batch]
+        exporters: [logging, azuremonitor, zipkin]
+      metrics:
+        receivers: [otlp]
+        processors: [memory_limiter,batch]
+        exporters: [logging, prometheus]
+      logs:
+        receivers: [otlp]
+        processors: [memory_limiter,batch]
+        exporters: [logging, azuremonitor]

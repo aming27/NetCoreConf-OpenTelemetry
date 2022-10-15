@@ -1,0 +1,72 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  labels:
+    app: rabbitmq
+  name: rabbitmq-cluster
+  namespace: otel-demo
+spec:
+  replicas: 3
+  image: rabbitmq:3.10-management
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: 256m
+      memory: 1Gi
+    limits:
+      cpu: 256m
+      memory: 1Gi
+  rabbitmq:
+    additionalConfig: |
+      default_user=guest
+      default_pass=guest
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rabbitmq-monitor
+  namespace: otel-demo
+spec:
+  endpoints:
+  - port: prometheus
+    scheme: http
+    interval: 15s
+    scrapeTimeout: 14s
+  - port: prometheus-tls
+    scheme: https
+    interval: 15s
+    scrapeTimeout: 14s
+    tlsConfig:
+      insecureSkipVerify: true # set to false and uncomment lines below to enable tls verification
+        # ca:
+        #   secret:
+        #     key: ca.crt
+        #     name: tls-secret # name of the secret containing the CA cert which signed the RabbitMQ Prometheus TLS cert
+        # serverName: '*.RABBITMQ-INSTANCE-NAME.NAMESPACE.svc.cluster.local'
+  - port: prometheus
+    scheme: http
+    path: /metrics/detailed
+    params:
+      family:
+        - queue_coarse_metrics
+        - queue_metrics
+    interval: 15s
+    scrapeTimeout: 14s
+  - port: prometheus-tls
+    scheme: https
+    path: /metrics/detailed
+    params:
+      family:
+        - queue_coarse_metrics
+        - queue_metrics
+    interval: 15s
+    scrapeTimeout: 14s
+    tlsConfig:
+      insecureSkipVerify: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: rabbitmq
+  namespaceSelector:
+    matchNames:
+    - otel-demo
