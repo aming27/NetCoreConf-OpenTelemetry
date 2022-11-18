@@ -24,7 +24,7 @@ namespace Frontend.Pages
             using var httpClient = new HttpClient();
             await httpClient.GetAsync(apiUrl);
 
-            return new EmptyResult();
+            return RedirectToPage("Success");
         }
     }
 }
