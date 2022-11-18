@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-frontend
+  namespace: otel-demo
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-frontend
+  template:
+    metadata:
+      labels:
+        app: otel-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: jcmartinezg23/otel-frontend
+        env:
+        - name: OTEL_COLLECTOR_URL
+          value: http://opentelemetry-collector.otel-demo:4317
+        - name: DEMO_API_URL
+          value: http://otel-api.otel-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-frontend
+  namespace: otel-demo
+spec:
+  selector:
+    app: otel-frontend
+  ports:
+    - protocol: TCP
+      port: 80
