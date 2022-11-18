@@ -41,26 +41,26 @@ spec:
       port: 80
       targetPort: 5000
 ---
-apiVersion: keda.sh/v1alpha1
-kind: ScaledObject
-metadata:
-  name: otel-worker-so
-  namespace: otel-demo
-spec:
-  scaleTargetRef:
-    name:          otel-worker
-  pollingInterval:  15
-  cooldownPeriod:   60
-  minReplicaCount:  0
-  maxReplicaCount:  3
-  fallback:
-    failureThreshold: 3
-    replicas: 3
-  triggers:
-  - type: rabbitmq
-    metadata:
-      host: http://guest:guest@rabbitmq-cluster.otel-demo:15672
-      mode: QueueLength 
-      value: "10" 
-      queueName: TestQueue
-      vhostName: /
+# apiVersion: keda.sh/v1alpha1
+# kind: ScaledObject
+# metadata:
+#   name: otel-worker-so
+#   namespace: otel-demo
+# spec:
+#   scaleTargetRef:
+#     name:          otel-worker
+#   pollingInterval:  15
+#   cooldownPeriod:   60
+#   minReplicaCount:  0
+#   maxReplicaCount:  3
+#   fallback:
+#     failureThreshold: 3
+#     replicas: 3
+#   triggers:
+#   - type: rabbitmq
+#     metadata:
+#       host: http://guest:guest@rabbitmq-cluster.otel-demo:15672
+#       mode: QueueLength 
+#       value: "10" 
+#       queueName: TestQueue
+#       vhostName: /

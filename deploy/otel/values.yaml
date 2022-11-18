@@ -24,19 +24,13 @@ securityContext:
   runAsUser: 1000
   runAsGroup: 1000
   runAsNonRoot: true
-  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecsecuritycontextselinuxoptions
-  # seLinuxOptions:
-  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecsecuritycontextselinuxoptions
-  # seccompProfile:
+  
 podSecurityContext:
   fsGroup: 1000
   runAsUser: 1000
   runAsGroup: 1000
   runAsNonRoot: true
-  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecpodsecuritycontextselinuxoptions
-  # seLinuxOptions:
-  #  ASK TO Jordi https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md#opentelemetrycollectorspecpodsecuritycontextselinuxoptions
-  # seccompProfile:
+  
 
 # In case of daemonset
 podMonitor: 
