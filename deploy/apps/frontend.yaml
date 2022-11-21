@@ -17,12 +17,12 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: jcmartinezg23/otel-frontend
+        image: jcmartinezg23/otel-frontend:success
         env:
         - name: OTEL_COLLECTOR_URL
           value: http://opentelemetry-collector.otel-demo:4317
         - name: DEMO_API_URL
-          value: http://otel-api.otel-demo
+          value: http://otel-api.otel-demo/sendmessage
 ---
 apiVersion: v1
 kind: Service
