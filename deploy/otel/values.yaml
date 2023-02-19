@@ -50,10 +50,10 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
 
-prometheusRule:
-  enabled: true
-  defaultRules:
-    enabled: true
+# prometheusRule:
+#   enabled: true
+#   defaultRules:
+#     enabled: true
 
 # Deprecated.  Use presets.logsCollection instead.
 containerLogs:
