@@ -84,7 +84,7 @@ namespace WorkerService
                         builder.IncludeScopes = true;
                         builder.ParseStateValues = true;
                         builder.AddOtlpExporter(options => options.Endpoint = new Uri(url));
-                        // builder.AddConsoleExporter();
+                        builder.AddConsoleExporter();
                     });
                 });
     }
